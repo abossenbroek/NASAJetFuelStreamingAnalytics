@@ -1,25 +1,21 @@
 /* SimpleApp.scala */
 package org.abossenbroek.NASAJetFuelStreamingAnalytics
 
-import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.sql.functions._
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.Row
-import org.apache.spark.sql.types.{FloatType, IntegerType, LongType, StringType, StructField, StructType}
 import org.apache.spark.streaming._
 
 object NasaStreaming {
   def main(args: Array[String]) {
+
     //Create a SparkContext to initialize Spark
-    val sc = SparkSession
-      .builder
+    val sc = SparkSession.builder
       .appName("NASAStreaming")
       .master("local[*]")
       .getOrCreate()
 
     // Create the FileInputDStream on the directory
-    val fd001 = new ReadNasaDataFile("src/main/resources/train_FD001.txt", sc)
-
+    val fd001 = ReadNasaDataFile.readFile("src/resources/train_FD001.txt", sc)
+    fd001.show()
 //    // A batch is created every 30 seconds
 //    val ssc = new org.apache.spark.streaming.StreamingContext(spark.sparkContext, org.apache.spark.streaming.Seconds(30))
 //
