@@ -5,14 +5,18 @@ import org.apache.spark
 import org.apache.spark.sql._
 import org.apache.spark.streaming._
 
-object NasaStreaming extends SparkSessionWrapper {
+import org.apache.spark.{SparkConf, SparkContext}
+
+
+object NasaStreaming {
   def main(args: Array[String]) {
 
+    val conf = new SparkConf()
+      .setAppName("NASAStreaming")
+      .setMaster("local[*]")
+
     //Create a SparkContext to initialize Spark
-    val sc = SparkSession.builder
-      .appName("NASAStreaming")
-      .master("local[*]")
-      .getOrCreate()
+    val sc = SparkSession.builder.config(conf).getOrCreate()
 
     import sc.sql
     import sc.implicits._
@@ -21,10 +25,8 @@ object NasaStreaming extends SparkSessionWrapper {
       sc.sparkContext,
       org.apache.spark.streaming.Seconds(30))
 
-    // Set the active SQLContext so that we can access it statically within the foreachRDD
-    org.apache.spark.sql.SQLContext.setActive(sc.sqlContext)
 
-    val fd001Streamer = new NasaStreamingSource("src/resources/train_FD001.txt")
+    val fd001Streamer = new NasaStreamingSource("src/resources/train_FD001.txt", conf)
 
     // Create the stream
     val stream = ssc.receiverStream(fd001Streamer)
@@ -38,7 +40,7 @@ object NasaStreaming extends SparkSessionWrapper {
     stream.foreachRDD { rdd =>
       {
         val rowRDD = rdd.flatMap(r => identity(r))
-        val df = sc.createDataFrame(rowRDD, ReadNasaDataFile.userSchema)
+        val df = sc.createDataFrame(rowRDD, ReadNasaDataFile.nasaSchema)
         df.show()
 //        val list = rdd.map(r => r.toList)
 //      println(
