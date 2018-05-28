@@ -17,6 +17,12 @@ class ReadNasaDataFileTest extends FlatSpec with Matchers with BeforeAndAfter {
       .getOrCreate()
   }
 
+  after {
+    if (sc != null) {
+      sc.stop()
+    }
+  }
+
   "ReadNasaTrainingFile " should " read file to data frame" in {
     val testFile = ReadNasaDataFile.readFile(filePath, sc)
     assert(testFile.rdd.count() == 20631)

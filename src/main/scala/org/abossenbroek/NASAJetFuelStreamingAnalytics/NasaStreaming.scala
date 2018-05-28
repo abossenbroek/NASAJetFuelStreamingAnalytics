@@ -1,11 +1,9 @@
 /* SimpleApp.scala */
 package org.abossenbroek.NASAJetFuelStreamingAnalytics
 
-import org.apache.spark
-import org.apache.spark.sql._
-import org.apache.spark.streaming._
+import org.apache.spark.sql.SparkSession
 
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.SparkConf
 
 
 object NasaStreaming {
@@ -18,8 +16,6 @@ object NasaStreaming {
     //Create a SparkContext to initialize Spark
     val sc = SparkSession.builder.config(conf).getOrCreate()
 
-    import sc.sql
-    import sc.implicits._
     // A batch is created every 30 seconds
     val ssc = new org.apache.spark.streaming.StreamingContext(
       sc.sparkContext,
@@ -31,7 +27,7 @@ object NasaStreaming {
     // Create the stream
     val stream = ssc.receiverStream(fd001Streamer)
 
-    val display = stream.foreachRDD { rdd =>
+    val display: Unit = stream.foreachRDD { rdd =>
       println(
         s"===========\n${rdd.toDebugString}\n=====Len array:${rdd.count()}")
     }
@@ -42,18 +38,6 @@ object NasaStreaming {
         val rowRDD = rdd.flatMap(r => identity(r))
         val df = sc.createDataFrame(rowRDD, ReadNasaDataFile.nasaSchema)
         df.show()
-//        val list = rdd.map(r => r.toList)
-//      println(
-//        s"===========\nLen list:${list.count()}")
-//        list.foreach(l => println(l))
-
-        // Access the SQLContext and create a table called nasa_streaming we can query
-//        val _sqlContext =
-//          org.apache.spark.sql.SQLContext.getOrCreate(rdd.sparkContext)
-//        _sqlContext
-//          .createDataFrame(rdd, fd001Streamer.schema)
-//          .show
-////          .registerTempTable("fd001_streaming")
       }
     }
 
