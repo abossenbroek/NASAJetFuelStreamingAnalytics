@@ -14,7 +14,7 @@ class NasaReceiver(val pathName: String, val recv: NasaStreamingSource)
   logger.info( s"Start NasaReceiver for pathName: $pathName")
 
   private def receive(): Unit = {
-    var counter = 1
+    var counter: Int = 1
     logger.info( s"Start receiving NasaReceiver for pathName: $pathName")
     // Create the FileInputDStream on the directory
     while (!recv.isStopped()) {

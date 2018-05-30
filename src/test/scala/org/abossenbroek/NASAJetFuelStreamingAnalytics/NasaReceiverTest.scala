@@ -32,7 +32,7 @@ class NasaReceiverTest extends FlatSpec with Matchers with BeforeAndAfter {
     val fd001Streamer = new NasaStreamingSource(filePath, conf)
 
     // Create the stream
-    stream = ssc.receiverStream(fd001Streamer)
+    //stream = ssc.receiverStream(fd001Streamer)
   }
 
   after {
